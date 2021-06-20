@@ -1,0 +1,10 @@
+.dockerignore
+
+# Standard Git Project Ignores
+.git
+.github
+CONTRIBUTORS.md
+README.md
+
+# Visual Studio Ignores
+.vs

@@ -1,0 +1,14 @@
+# See https://help.github.com/articles/about-codeowners/
+# for more info about CODEOWNERS file
+
+# Obvisously, these owners would be replaced by their repective teams.
+
+# CI Pipeline Owners
+/ci             @kaiser-dev
+
+# Docker Developer Owners
+/dockerfile     @kaiser-dev
+
+# Application Code Owners
+/src            @kaiser-dev
+/tests          @kaiser-dev
