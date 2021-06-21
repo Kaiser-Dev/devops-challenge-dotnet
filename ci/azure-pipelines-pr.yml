@@ -1,0 +1,30 @@
+pr:
+  branches:
+    include:
+    - '*'
+
+resources:
+- repo: self
+
+pool:
+  name: Default
+# Since Azure no longer offers easily accessible free-tier computation, I switched to a self-managed Agent Pool.
+# In normal best practices, this project has no special requirements (so far) that would require the extra maintenance overhead of self-managed Build Agents
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build and Test Image
+  jobs:
+  - job: Build
+    displayName: Build
+    steps:
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        command: build
+        dockerfile: 'dockerfile'
+        tags: |
+          $(tag)
