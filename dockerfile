@@ -7,9 +7,8 @@ COPY . ./
 
 # Build, test, publish
 RUN dotnet restore
-RUN dotnet build -c Release
-#RUN dotnet test
-RUN dotnet publish -c Release -o outDir
+RUN dotnet publish -c Release -o outDir --no-restore
+RUN dotnet test outDir/DevOpsChallenge.SalesApi.Business.UnitTests.dll
 
 # Setup runtime container, copy build output in
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
