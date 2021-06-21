@@ -9,6 +9,11 @@ trigger:
 resources:
 - repo: self
 
+pool:
+  name: Default
+# Since Azure no longer offers easily accessible free-tier computation, I switched to a self-managed Agent Pool.
+# In normal best practices, this project has no special requirements (so far) that would require the extra maintenance overhead of self-managed Build Agents
+
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'b34e8df6-ae97-4e0f-97c1-978c83e3df15'
@@ -17,7 +22,6 @@ variables:
   dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
   imagePullSecret: 'salesapicontainerregd80f-auth'
-
 
 stages:
 - stage: Build and Test
