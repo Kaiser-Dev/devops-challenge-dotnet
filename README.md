@@ -1,69 +1,88 @@
 # DevOps Challenge (.NET)
 
-## Introduction :wave:
+Dotnet Core API-Layer Application
 
-This challenge utilises the broad range of skills required by a DevOps Engineer. It focuses on DevOps for a .NET 5 application.
+## Repository Structure
 
-In completing the challenge, you're welcome to change all aspects of the initial repository, including:
-* Directory and file structure.
-* Solution and project names.
-* Namespaces and class names.
-* Code, data, and settings files.
-* NuGet packages and dependencies.
-* This README!
+    .
+    ├── ci            # Azure Pipeline Continuous Integration files (DevOps owned)
+    ├── src           # Source files (Developer owned)
+    ├── test          # Unit and Integration tests (Developer owned)
+    ├── dockerfile    # Container definition for building, testing and deployment (DevOps owned)
+    ├── LICENSE
+    └── README.md
 
-The solution should represent best practices, even if the starting solution is lacking them.
+## Contributing
 
-You'll need .NET 5 and SQL Server Local DB to build and run the application locally. On a Mac or Linux device, you can update the connection string (in `appsettings.Development.json` and `DatabaseContextDesignTimeFactory.cs`) and use Docker to launch SQL Server Developer Edition.
+To build and run the application locally you will need:
+* .NET 5 
+* SQL Server Local DB
 
-## Scenario :blue_book:
+On a Mac or Linux device, you can update the connection string (in `appsettings.Development.json` and `DatabaseContextDesignTimeFactory.cs`) and use Docker to launch SQL Server Developer Edition.
 
-You're a DevOps Engineer working in a small team to launch a new application. The management team will use the new application to view and report on daily sales data.
+It is highly recommended that test builds are made in containers, with the supplied Dockerfile. In this case, you will only need Docker to be installed and capable of running Windows containers. This will be the method Azure Pipelines will use to build your code.
 
-The development team have built a new API to ingest sales data from an existing system and provide endpoints for viewing and reporting the data. A future application will provide a user interface.
+Contributions are via pull requests. Please follow the guidelines for a quick review.
 
-*Note: For simplicity of the solution, the API does not require authentication. Don't do this in a real application!*
+### Creating a fork
 
-## Challenge :question:
+1. Create a fork of the main repository via the [Github website](https://github.com/Kaiser-Dev/devops-challenge-dotnet). The fork should be owned by your account.
+1. If you haven't already got a clone of the source on your machine, clone the repo
+   * ```git clone git@github.com:Kaiser-Dev/devops-challenge-dotnet.git devops-challenge-dotnet```
+1. Disable push to origin (for safety!). This will prevent you from accidentally pushing your changes to the main branch
+   * ```git remote set-url --push origin no_push```
+1. Add a remote to your fork. This will allow you to submit pull requests later on (in this example, the remote is called 'personal'
+   * ```git remote add personal git@github.com:<YOUR_GITHUB_USER>/devops-challenge-dotnet.git```
 
-You should:
+### Before raising a pull request
 
-1. Introduce best practices into the solution to ensure a high-quality deliverable and a great developer experience.
+1. Ensure the coding guidelines have been followed
+1. Add sufficient tests for any change that can be tested using unit or integration tests
+1. Commit message summary line references the user story or defect where applicable (e.g. DE123)
+   * These should also be present in the pull request title
 
-2. Build and package the application as a container in a CI/CD pipeline ready for deployment
+### Raising a pull request
+1. Create a new branch, ideally branched from the 'latest' main (or the 'latest' for a branch you're working on)
+2. Make the changes in the branch
+   * ```git checkout -B my-changes origin/master --no-track```
+2. Push your changes to your fork
+   * ```git push personal my-changes```
+3. Raise a pull request on here
+4. Wait for Azure Pipelines to verify your change (triggers from webhook)
+5. Receive a Pull Request review from a team member, as well as the CODEOWNER if applicable.
 
-You'll need to select a CI/CD tool to complete the challenge. Feel free to use your preferred platform, such as GitHub Actions, Azure Pipelines, Circle CI, or Travis CI.
+## Deployment
 
-*Note: This challenge does NOT require infrastructure provisioning or deployment. This challenge has designed to be possible without incurring any licencing, hosting or tooling costs.*
+To Provision an environment for deployment, you will first need the Azure CLI:
+https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli
 
-## Opportunities (optional) :zap:
+Azure Pipelines are currently set up to work with the named resources created here:
 
-You've received feedback on the application from members of the project team. Optionally, fix these issues, or provide instructions back to the developer on the next steps to take:
+```powershell
+# Create a resource group
+az group create --name sales-api-rg --location australiasoutheast
 
-1. The front end developer consuming the Sales API has mentioned the Swagger UI interface doesn't contain descriptions of operations, parameters, or responses. The Swagger UI interface should display the code comments written by the API developer.
+# Create a container registry
+az acr create --resource-group sales-api-rg --name salesApiContainerReg --sku Basic
 
-2. The security team have identified the application is revealing the technology used by sending the response header `Server: Kestrel`. This header should not be present in responses sent by the server.
+# Create a Kubernetes cluster
+az aks create `
+    --resource-group sales-api-rg `
+    --name sales-api-aks `
+    --node-count 1 `
+    --enable-addons monitoring `
+    --generate-ssh-keys
+```
 
-3. The database administrator has identified poor query performance when a sale record is retrieved using its transaction ID. They have recommended creating an index.
+When finished, for cost-saving, all provisioned resources can be deleted:
 
-## Effort :clock5:
+```powershell
+# Delete resource group
+az group delete --name sales-api-rg
+```
 
-Spend as much or as little time as you like on this challenge. DevOps Engineers wear many hats :crown:, and there's always more opportunity for change and improvement. **Limit yourself to the time you have. Make the changes that deliver the most value.**
+## To Do
 
-If you're looking for inspiration of changes to make, consider:
-
-* Getting started documentation for a new developer.
-* Configuring Git's behaviour for particular files.
-* Versioning of artifacts.
-* Linting and code quality analysis.
-* Scanning for code vulnerabilities.
-* Running unit tests.
-* Assessing code coverage.
-* Indexing PDBs for debugging in a deployed environment.
-* Preparing to run integration tests on a deployed environment.
-* Preparing to deploy database schema migrations.
-* Generating a client for the API.
-
-There's always more to learn and do. **You don't need to do all of these to demonstrate your ability.** This list is a suggestion of ideas. You're welcome to do something else.
-
-Be kind to yourself, and enjoy the challenge. :heart:
+* Translate static provisioning script to ARM template
+* Support parameterised builds to allow for multiple environments
+* Collect Unit Test execution results and publish to GitHub, for better visibility on passing/failing tests
